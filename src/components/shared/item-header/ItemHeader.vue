@@ -27,7 +27,11 @@ export default {
 }
 
 .item-header a {
-  columns: white;
+  color: white;
+}
+
+.item-header a:visited {
+  color: #FFF;
 }
 
 </style>

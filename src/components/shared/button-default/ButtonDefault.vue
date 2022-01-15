@@ -24,7 +24,7 @@ export default {
     max-width: 250px;
     border: 1px solid #FFF;
     padding: 5px 10px;
-    margin: 15px 0 ;
+    margin: 15px 15px;
     cursor: pointer;
     background-color: transparent;
     color: #FFF;

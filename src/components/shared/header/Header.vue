@@ -1,9 +1,8 @@
 <template>
   <div id="header">
-      <img src="" alt="logo"/>
       <div class="menu-header">
-        <ItemHeader href="">Sobre mim</ItemHeader>
-        <ItemHeader href="experience">Minha experiência</ItemHeader>
+        <ItemHeader href="">Filmes</ItemHeader>
+        <ItemHeader href="quiz">Quiz</ItemHeader>
         <ItemHeader href="projeto">Este projeto</ItemHeader>
       </div>
   </div>
@@ -35,5 +34,6 @@ export default {
 .menu-header {
     display: flex;
     justify-content: center;
+    margin: 25px 5px 100px 5px;
 }
 </style>

@@ -2,7 +2,7 @@
     <div id="container">
         <h1>{{ title }}</h1>
         <div id="containerMovieSearch">
-            <SearchInput :id="'textSearch'" :placeholder="'Digite aqui um nome de filme ou série'"></SearchInput>
+            <SearchInput :id="'textSearch'" :placeholder="'Ex: Breaking Bad'"></SearchInput>
             <ButtonDefault v-on:btdefaultclicked="searchMovie">Buscar</ButtonDefault>
         </div>
         <DefaultList :id="'movieList'" :items="items"></DefaultList>
@@ -15,7 +15,6 @@ import DefaultList from '../shared/default-list/DefaultList.vue';
 import ButtonDefault from '../shared/button-default/ButtonDefault.vue';
 import SearchInput from '../shared/search-input/SearchInput.vue';
 import Loading from '../shared/loading/Loading.vue';
-
 
 export default {
   data () {
