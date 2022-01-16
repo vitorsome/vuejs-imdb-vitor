@@ -1,12 +1,14 @@
 <template>
      <div id="container">
-        <Loading :visible="loading"></Loading>
-        <div v-if="this.movie != '' && this.endProgress == false" :style="this.loading == true ? 'visibility:hidden' : ''" class="quiz-container">
-            <div>{{ this.getCurrentQuizQuestion() }}</div>
-            <div v-if="this.answerOptions.length > 0" id="options" class="answer-options">
-               <div v-for="option in this.answerOptions" :key="option">
-                    <ButtonDefault v-on:btdefaultclicked="checkAnswer" :textButton="option"></ButtonDefault>
-               </div>
+        <div style="position:relative;height:300px;">
+            <Loading :visible="loading"></Loading>
+            <div v-if="this.movie != '' && this.endProgress == false && this.loading == false" :style="this.loading == true ? 'visibility:hidden' : ''"  class="quiz-container">
+                <div>{{ this.getCurrentQuizQuestion() }}</div>
+                <div v-if="this.answerOptions.length > 0" id="options" class="answer-options">
+                <div v-for="option in this.answerOptions" :key="option">
+                    <ButtonOption v-on:btdefaultclicked="checkAnswer" :textButton="option"></ButtonOption>
+                </div>
+                </div>
             </div>
         </div>
         <div v-if="endProgress">
@@ -23,6 +25,7 @@
 <script>
 import ButtonDefault from '../shared/button-default/ButtonDefault.vue';
 import Loading from '../shared/loading/Loading.vue';
+import ButtonOption from '../shared/button-option/ButtonOption.vue';
 
 export default {
   data () {
@@ -99,7 +102,10 @@ export default {
              this.answerOptions.push(Math.random() * (this.movie.year + 3 - this.movie.year - 3) + this.movie.year - 3); 
          } else if (this.currentQuestion == 2) {
              this.answerOptions.push(this.movie.cast);
-             let randomActors = ['Anthony Hopkins','Angelina Jolie','Morgan Freeman','Robert De Niro', 'Julia Roberts', 'Jeniffer Lawrence', 'Amy Adams', 'Tom Cruise', 'Brad Pitt', 'Nicole Kidman', 'Leonardo DiCaprio']
+             let randomActors = ['Anthony Hopkins','Angelina Jolie','Morgan Freeman',
+             'Robert De Niro', 'Julia Roberts', 'Jeniffer Lawrence', 'Amy Adams', 
+             'Tom Cruise', 'Brad Pitt', 'Nicole Kidman', 'Leonardo DiCaprio', 'Joseph Gordon-Levitt', 
+             'Gal Gadot', 'George Clooney', 'Anne Hathaway', 'Daniel Kaluuya', 'Allison Williams']
              const shuffled = randomActors.sort(() => 0.5 - Math.random());
              this.answerOptions.push(shuffled.slice(0, 2).join(', '));
              this.answerOptions.push(shuffled.slice(2, 4).join(', '));
@@ -119,7 +125,8 @@ export default {
   },
   components: {
       ButtonDefault,
-      Loading
+      Loading,
+      ButtonOption
   }
 }
 </script>
@@ -137,7 +144,7 @@ export default {
        flex-flow: column;
        align-items: center;
        margin-top: 20px;
-       height: 400px;
+       height: 300px;
    }
 
    .answer-options {
@@ -145,6 +152,7 @@ export default {
        justify-content: center;
        align-content: center;
        flex-flow: column;
+       text-align: center;
    }
 
 </style>

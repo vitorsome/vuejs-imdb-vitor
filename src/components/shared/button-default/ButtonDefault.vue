@@ -31,6 +31,7 @@ export default {
     color: #FFF;
     font-family: 'Roboto', sans-serif;
     transition: all ease 0.8s;
+    border-radius: 8px;
 }
 
 .button-default:hover {
