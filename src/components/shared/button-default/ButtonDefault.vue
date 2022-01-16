@@ -1,7 +1,7 @@
 <template>
  <div class="item-header">
     <button type="button" class="button-default"  @click="$emit('btdefaultclicked', $event.target.checked)">
-        <slot></slot>
+        {{ this.textButton }}
     </button>
  </div>
 </template>
@@ -13,6 +13,7 @@ export default {
       
     }
   },
+  props:['textButton']
 }
 </script>
 

@@ -1,11 +1,11 @@
 <template>
      <div id="container">
         <Loading :visible="loading"></Loading>
-        <div v-if="this.movie != '' && this.endProgress == false" class="quiz-container">
+        <div v-if="this.movie != '' && this.endProgress == false" :style="this.loading == true ? 'visibility:hidden' : ''" class="quiz-container">
             <div>{{ this.getCurrentQuizQuestion() }}</div>
             <div v-if="this.answerOptions.length > 0" id="options" class="answer-options">
                <div v-for="option in this.answerOptions" :key="option">
-                    <ButtonDefault v-on:btdefaultclicked="checkAnswer">{{ option }}</ButtonDefault>
+                    <ButtonDefault v-on:btdefaultclicked="checkAnswer" :textButton="option"></ButtonDefault>
                </div>
             </div>
         </div>
@@ -14,8 +14,8 @@
             <div>A sua pontuação final foi de: {{this.score}}</div>
         </div>
         <div id="buttonsQuiz">
-            <ButtonDefault v-if="this.currentQuestion > 0" v-on:btdefaultclicked="stopQuiz">Encerrar Quiz!</ButtonDefault>
-            <ButtonDefault v-on:btdefaultclicked="startQuiz">Iniciar Quiz</ButtonDefault>
+            <ButtonDefault v-if="this.currentQuestion > 0" v-on:btdefaultclicked="stopQuiz" textButton="Encerrar Quiz"></ButtonDefault>
+            <ButtonDefault v-on:btdefaultclicked="startQuiz" :textButton="this.nextButtonText"></ButtonDefault>
         </div>
     </div>
 </template>
@@ -40,15 +40,26 @@ export default {
         score: 0,
         endProgress: false,
         loading: false,
-        answerOptions: []
+        answerOptions: [],
+        currentMovie: null,
+        nextButtonText: "Iniciar Quiz"
     }
   },
   methods: {
       startQuiz() {
-        const currentMovie = this.movies[this.indexMovie];
+        this.currentQuestion++;
+        this.nextButtonText = 'Próxima questão';
+        if (this.currentMovie == null) {
+            this.currentMovie = this.movies[this.indexMovie];
+        }
+        if (this.currentQuestion > 3) {
+            this.indexMovie++;
+            this.currentQuestion = 1;
+            this.currentMovie = this.movies[this.indexMovie];
+        }       
         this.loading = true;
-        if (currentMovie != '') {
-            fetch("https://imdb8.p.rapidapi.com/auto-complete?q="+encodeURI(currentMovie), {
+        if (this.currentMovie != '') {
+            fetch("https://imdb8.p.rapidapi.com/auto-complete?q="+encodeURI(this.currentMovie), {
                     "method": "GET",
                     "headers": {
                         "x-rapidapi-host": "imdb8.p.rapidapi.com",
@@ -63,12 +74,7 @@ export default {
                     this.movie.cast = response.d[0].s;
                     this.movie.rank = response.d[0].rank;
                     this.loading = false;
-                    this.currentQuestion++;
-                    this.getAnswerOptionsCurrentMovie();
-                    if (this.currentQuestion > 3) {
-                        this.indexMovie++;
-                        this.currentQuestion = 0;
-                    }
+                    this.getAnswerOptionsCurrentMovie();                   
                 })
                 .catch(err => {
                     console.error(err);
@@ -130,6 +136,8 @@ export default {
        display: flex;
        flex-flow: column;
        align-items: center;
+       margin-top: 20px;
+       height: 400px;
    }
 
    .answer-options {

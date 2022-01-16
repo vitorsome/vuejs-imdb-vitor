@@ -3,7 +3,7 @@
         <h1>{{ title }}</h1>
         <div id="containerMovieSearch">
             <SearchInput :id="'textSearch'" :placeholder="'Ex: Breaking Bad'"></SearchInput>
-            <ButtonDefault v-on:btdefaultclicked="searchMovie">Buscar</ButtonDefault>
+            <ButtonDefault v-on:btdefaultclicked="searchMovie" textButton="Buscar"></ButtonDefault>
         </div>
         <DefaultList :id="'movieList'" :items="items"></DefaultList>
         <Loading :visible="loading"></Loading>
