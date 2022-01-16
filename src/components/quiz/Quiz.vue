@@ -6,18 +6,19 @@
                 <div>{{ this.getCurrentQuizQuestion() }}</div>
                 <div v-if="this.answerOptions.length > 0" id="options" class="answer-options">
                 <div v-for="option in this.answerOptions" :key="option">
-                    <ButtonOption v-on:btdefaultclicked="checkAnswer" :textButton="option"></ButtonOption>
+                    <ButtonOption v-on:btdefaultclicked="checkAnswer(option)" :textButton="option"></ButtonOption>
                 </div>
                 </div>
             </div>
         </div>
         <div v-if="endProgress">
             <div>Obrigado por jogar! :)</div>
-            <div>A sua pontuação final foi de: {{this.score}}</div>
+            <div>Você acertou <b>{{this.score}}</b> questões!</div>
         </div>
         <div id="buttonsQuiz">
+            <ButtonAction v-if="this.currentQuestion == 0" v-on:btdefaultclicked="startQuiz" :textButton="this.nextButtonText"></ButtonAction>
             <ButtonDefault v-if="this.currentQuestion > 0" v-on:btdefaultclicked="stopQuiz" textButton="Encerrar Quiz"></ButtonDefault>
-            <ButtonDefault v-on:btdefaultclicked="startQuiz" :textButton="this.nextButtonText"></ButtonDefault>
+            <ButtonDefault v-if="this.currentQuestion > 0" v-on:btdefaultclicked="startQuiz" :textButton="this.nextButtonText"></ButtonDefault>
         </div>
     </div>
 </template>
@@ -26,16 +27,13 @@
 import ButtonDefault from '../shared/button-default/ButtonDefault.vue';
 import Loading from '../shared/loading/Loading.vue';
 import ButtonOption from '../shared/button-option/ButtonOption.vue';
+import ButtonAction from '../shared/button-action/ButtonAction.vue';
+import Cache from '../../core/cache';
 
 export default {
   data () {
     return {
-        movie: {
-            name: '',
-            year: '',
-            cast: '',
-            rank: ''
-        },
+        movie: {name: '', year: '', cast: '', rank: ''},
         currentQuestion: 0,
         movies: ['Inception', 'Interstellar', 'Dunkirk', 'Get Out', "Gravity", 'Gone Girl', 'Wonder Woman', 'Inside Out'],
         props: ['visible'],
@@ -45,11 +43,16 @@ export default {
         loading: false,
         answerOptions: [],
         currentMovie: null,
-        nextButtonText: "Iniciar Quiz"
+        nextButtonText: "Iniciar",
+        cache: new Cache()
     }
   },
   methods: {
       startQuiz() {
+        this.endProgress = false;
+        if (this.currentQuestion == 0 && this.indexMovie == 0) {
+            this.score = 0;
+        }
         this.currentQuestion++;
         this.nextButtonText = 'Próxima questão';
         if (this.currentMovie == null) {
@@ -62,30 +65,42 @@ export default {
         }       
         this.loading = true;
         if (this.currentMovie != '') {
-            fetch("https://imdb8.p.rapidapi.com/auto-complete?q="+encodeURI(this.currentMovie), {
-                    "method": "GET",
-                    "headers": {
-                        "x-rapidapi-host": "imdb8.p.rapidapi.com",
-                        "x-rapidapi-key": "0a324edf47mshd02e0b35e2fc273p10d6a3jsn11aaa3cf1305"
-                    }
-                })
-                .then(response => {
-                    return response.json();
-                }).then(response => {
-                    this.movie.name = response.d[0].l;
-                    this.movie.year = response.d[0].y;
-                    this.movie.cast = response.d[0].s;
-                    this.movie.rank = response.d[0].rank;
-                    this.loading = false;
-                    this.getAnswerOptionsCurrentMovie();                   
-                })
-                .catch(err => {
-                    console.error(err);
-                });
+            this.cache.getObjectCache(this.currentMovie);
+            if (!this.cache.value) {
+                fetch("https://imdb8.p.rapidapi.com/auto-complete?q="+encodeURI(this.currentMovie), {
+                        "method": "GET",
+                        "headers": {
+                            "x-rapidapi-host": "imdb8.p.rapidapi.com",
+                            "x-rapidapi-key": "0a324edf47mshd02e0b35e2fc273p10d6a3jsn11aaa3cf1305"
+                        }
+                    })
+                    .then(response => {
+                        return response.json();
+                    }).then(response => {
+                        this.cache.setObjectCache(this.currentMovie, JSON.stringify(response));
+                        this.fillMovieInformation(response);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    });
+                } else {
+                    this.fillMovieInformation(this.cache.value);
+                }
             }
+      },
+      fillMovieInformation(movieInformation) {
+          this.movie.name = movieInformation.d[0].l;
+          this.movie.year = movieInformation.d[0].y;
+          this.movie.cast = movieInformation.d[0].s;
+          this.movie.rank = movieInformation.d[0].rank;
+          this.getAnswerOptionsCurrentMovie();
+          this.loading = false;
       },
       stopQuiz() {
           this.endProgress = true;
+          this.nextButtonText = 'Jogar novamente';
+          this.indexMovie = 0;
+          this.currentQuestion = 0;
       },
       getCurrentQuizQuestion() {
           switch (this.currentQuestion) {
@@ -105,7 +120,7 @@ export default {
              let randomActors = ['Anthony Hopkins','Angelina Jolie','Morgan Freeman',
              'Robert De Niro', 'Julia Roberts', 'Jeniffer Lawrence', 'Amy Adams', 
              'Tom Cruise', 'Brad Pitt', 'Nicole Kidman', 'Leonardo DiCaprio', 'Joseph Gordon-Levitt', 
-             'Gal Gadot', 'George Clooney', 'Anne Hathaway', 'Daniel Kaluuya', 'Allison Williams']
+             'Gal Gadot', 'George Clooney', 'Anne Hathaway', 'Daniel Kaluuya', 'Allison Williams'];
              const shuffled = randomActors.sort(() => 0.5 - Math.random());
              this.answerOptions.push(shuffled.slice(0, 2).join(', '));
              this.answerOptions.push(shuffled.slice(2, 4).join(', '));
@@ -116,8 +131,15 @@ export default {
          }
          this.answerOptions = this.answerOptions.sort(() => 0.5 - Math.random());
       },
-      checkAnswer() {
-
+      checkAnswer(option) {
+          if (this.currentQuestion == 1 && option == this.movie.year) {
+              this.score++;
+          } else if (this.currentQuestion == 2 && option == this.movie.cast) {
+              this.score++;
+          } else if (this.currentQuestion == 3 && option == this.movie.rank) {
+              this.score++;
+          }
+          this.startQuiz();
       }
   },
   mounted() {
@@ -126,7 +148,8 @@ export default {
   components: {
       ButtonDefault,
       Loading,
-      ButtonOption
+      ButtonOption,
+      ButtonAction
   }
 }
 </script>
