@@ -23,6 +23,7 @@ Cache.prototype.getObjectCache = function(key) {
        this.key = key;
        this.value = JSON.parse(cached);
     }
+    return JSON.parse(cached);
 }
 
 export default Cache;

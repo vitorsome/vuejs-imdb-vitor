@@ -15,6 +15,7 @@ import DefaultList from '../shared/default-list/DefaultList.vue';
 import ButtonDefault from '../shared/button-default/ButtonDefault.vue';
 import SearchInput from '../shared/search-input/SearchInput.vue';
 import Loading from '../shared/loading/Loading.vue';
+import Movie from '../../core/Movie';
 
 export default {
   data () {
@@ -26,28 +27,17 @@ export default {
   },
   methods: {
       searchMovie () {
-       let search = document.getElementById('textSearch').value.trim();
-       this.items = [];
-       this.loading = true;
-       if (search != '') {
-        fetch("https://imdb8.p.rapidapi.com/auto-complete?q="+encodeURI(search), {
-                "method": "GET",
-                "headers": {
-                    "x-rapidapi-host": "imdb8.p.rapidapi.com",
-                    "x-rapidapi-key": "0a324edf47mshd02e0b35e2fc273p10d6a3jsn11aaa3cf1305"
-                }
-            })
-            .then(response => {
-                return response.json();
-            }).then(response => {
-                this.items = response.d;
-                this.loading = false;
-            })
-            .catch(err => {
-                console.error(err);
-            });
-        }
-    }
+          let search = document.getElementById('textSearch').value.trim();
+          this.items = [];
+          this.loading = true;
+          if (search != '') {
+              let movieController = new Movie();
+              movieController.requestAllMoviesImdb(search).then((movies) => {
+                  this.items = movies;
+                  this.loading = false;
+              });
+            }
+       }
   },
   components:{
     DefaultList:DefaultList,

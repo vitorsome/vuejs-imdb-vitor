@@ -34,7 +34,7 @@ import Movie from '../../core/Movie';
 export default {
   data () {
     return {
-        movie: null,
+        movie: new Movie(),
         currentQuestion: 0,
         movies: ['Inception', 'Interstellar', 'Dunkirk', 'Get Out', "Gravity", 'Gone Girl', 'Wonder Woman', 'Inside Out'],
         props: ['visible'],
@@ -66,33 +66,11 @@ export default {
         }       
         this.loading = true;
         if (this.currentMovie != '') {
-            this.cache.getObjectCache(this.currentMovie);
-            if (!this.cache.value) {
-                fetch("https://imdb8.p.rapidapi.com/auto-complete?q="+encodeURI(this.currentMovie), {
-                        "method": "GET",
-                        "headers": {
-                            "x-rapidapi-host": "imdb8.p.rapidapi.com",
-                            "x-rapidapi-key": process.env.VUE_APP_APIKEY
-                        }
-                    })
-                    .then(response => {
-                        return response.json();
-                    }).then(response => {
-                        this.cache.setObjectCache(this.currentMovie, JSON.stringify(response));
-                        this.fillMovieInformation(response);
-                    })
-                    .catch(err => {
-                        console.error(err);
-                    });
-                } else {
-                    this.fillMovieInformation(this.cache.value);
-                }
-            }
-      },
-      fillMovieInformation(movieInformation) {
-          this.movie = new Movie(movieInformation.d[0].l, movieInformation.d[0].y, movieInformation.d[0].s, movieInformation.d[0].rank);
-          this.getAnswerOptionsCurrentMovie();
-          this.loading = false;
+            this.movie.requestMovieImdb(this.currentMovie).then(() => {
+                this.loading = false;
+                this.getAnswerOptionsCurrentMovie();
+            });
+        }
       },
       stopQuiz() {
           this.endProgress = true;

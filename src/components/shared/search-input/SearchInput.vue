@@ -21,10 +21,11 @@ export default {
 .search-input input {
   min-width: 350px;
   max-width: 500px;
-  height: 20px;
+  height: 32px;
   color: #FFF;
   background-color: transparent;
   border: 1px solid #FFF;
+  border-radius: 8px;
 }
 
 </style>
