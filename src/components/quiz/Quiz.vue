@@ -2,7 +2,7 @@
      <div id="container">
         <div style="position:relative;height:300px;">
             <Loading :visible="loading"></Loading>
-            <div v-if="this.movie != '' && this.endProgress == false && this.loading == false" :style="this.loading == true ? 'visibility:hidden' : ''"  class="quiz-container">
+            <div v-if="this.movie != null && this.endProgress == false && this.loading == false" :style="this.loading == true ? 'visibility:hidden' : ''"  class="quiz-container">
                 <div>{{ this.getCurrentQuizQuestion() }}</div>
                 <div v-if="this.answerOptions.length > 0" id="options" class="answer-options">
                 <div v-for="option in this.answerOptions" :key="option">
@@ -29,11 +29,12 @@ import Loading from '../shared/loading/Loading.vue';
 import ButtonOption from '../shared/button-option/ButtonOption.vue';
 import ButtonAction from '../shared/button-action/ButtonAction.vue';
 import Cache from '../../core/cache';
+import Movie from '../../core/Movie';
 
 export default {
   data () {
     return {
-        movie: {name: '', year: '', cast: '', rank: ''},
+        movie: null,
         currentQuestion: 0,
         movies: ['Inception', 'Interstellar', 'Dunkirk', 'Get Out', "Gravity", 'Gone Girl', 'Wonder Woman', 'Inside Out'],
         props: ['visible'],
@@ -71,7 +72,7 @@ export default {
                         "method": "GET",
                         "headers": {
                             "x-rapidapi-host": "imdb8.p.rapidapi.com",
-                            "x-rapidapi-key": "0a324edf47mshd02e0b35e2fc273p10d6a3jsn11aaa3cf1305"
+                            "x-rapidapi-key": process.env.VUE_APP_APIKEY
                         }
                     })
                     .then(response => {
@@ -89,10 +90,7 @@ export default {
             }
       },
       fillMovieInformation(movieInformation) {
-          this.movie.name = movieInformation.d[0].l;
-          this.movie.year = movieInformation.d[0].y;
-          this.movie.cast = movieInformation.d[0].s;
-          this.movie.rank = movieInformation.d[0].rank;
+          this.movie = new Movie(movieInformation.d[0].l, movieInformation.d[0].y, movieInformation.d[0].s, movieInformation.d[0].rank);
           this.getAnswerOptionsCurrentMovie();
           this.loading = false;
       },
@@ -144,6 +142,7 @@ export default {
   },
   mounted() {
       this.visible = false;
+      console.log();
   },
   components: {
       ButtonDefault,
