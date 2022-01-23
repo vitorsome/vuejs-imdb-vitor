@@ -1,7 +1,13 @@
 <template>
     <div>
-        <h1>A experiência de {{ nome }} com Vue.js</h1>
-        <img />
+        <h1>Sobre este projeto</h1>
+        <p>
+            Este projeto foi totalmente desenvolvido com o framework <a href="https://vuejs.org/" target="_blank">VueJS</a>.
+        </p>
+        <p>Ainda, as informações de filmes são obtidas através de uma API com informações do <a href="https://www.imdb.com/" target="_blank">iMDB</a>.</p>
+        <p>O código fonte desse projeto pode ser visto no <a href="https://github.com/vitorsome/vuejs-imdb-vitor" target="_blank">Github do desenvolvedor.</a></p>
+        
+
     </div>
 </template>
 
@@ -18,7 +24,22 @@ export default {
 
 <style scoped>
     h1 {
-        font-size: 30px;
-        color: blue;
+       font-size: 24px;
+       text-align: center;
+    }
+
+    a {
+        color: #FFF;
+        font-weight: bold;
+    }
+
+    p {
+        margin-left: 50px;
+    }
+
+    @media (max-width: 768px) {
+        p {
+            margin-left: 0;
+        }
     }
 </style>

@@ -11,7 +11,7 @@
                 </div>
             </div>
         </div>
-        <div v-if="endProgress">
+        <div v-if="endProgress" class="quiz-result">
             <div>Obrigado por jogar! :)</div>
             <div>Você acertou <b>{{this.score}}</b> questões!</div>
         </div>
@@ -153,6 +153,12 @@ export default {
        align-content: center;
        flex-flow: column;
        text-align: center;
+   }
+
+   .quiz-result {
+       text-align: center;
+       height: 100px;
+       font-size: 24px
    }
 
 </style>
